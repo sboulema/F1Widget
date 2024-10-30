@@ -39,10 +39,10 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/feedarr:${{ env.tag }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/feedarr:${{ github.run_number }}
-            ghcr.io/${{ github.actor }}/feedarr:${{ env.tag }}
-            ghcr.io/${{ github.actor }}/feedarr:${{ github.run_number }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/f1widget:${{ env.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/f1widget:${{ github.run_number }}
+            ghcr.io/${{ github.actor }}/f1widget:${{ env.tag }}
+            ghcr.io/${{ github.actor }}/f1widget:${{ github.run_number }}
 
       - name: Deploy
         uses: appleboy/ssh-action@master
