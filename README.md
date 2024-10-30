@@ -15,7 +15,14 @@ The setting can be changed using environment variables.
 | TZ   | TZ identifier taken from [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) |
 
 ## Widgets
+![Widget Mclaren 2024 Chrome](art/Widget_Mclaren_2024_Chrome.png.png)
+
+[Download](widgets/F1Widget_Mclaren_2024_Chrome.kwgt)
+
+### Usage
 TODO
+- Import in KWGT
+- Add new widget size 2x1
 
 ## Documentation
 
