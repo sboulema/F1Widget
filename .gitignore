@@ -1,0 +1,4 @@
+.vs
+/src/artifacts
+/src/.vs
+/src/*.user
