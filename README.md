@@ -15,9 +15,9 @@ The setting can be changed using environment variables.
 | TZ   | TZ identifier taken from [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) |
 
 ## Widgets
-![Widget Mclaren 2024 Chrome](art/Widget_Mclaren_2024_Chrome.png)
+[![Mclaren 2024 Chrome](art/Widget_Mclaren_2024_Chrome.png)](widgets/F1Widget_Mclaren_2024_Chrome.kwgt) [![Ferrari 2025](art/F1Widget_Ferrari_2025.jpg)](widgets/F1Widget_Ferrari_2025.kwgt)
 
-[Download](widgets/F1Widget_Mclaren_2024_Chrome.kwgt)
+Click pictures to download the widget
 
 ### Usage
 TODO
