@@ -1,6 +1,8 @@
+using System.Drawing.Imaging;
 using F1Widget.Models;
 using Geolocation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Svg;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,7 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
         => int.Parse(layout.Seasons.Split("-")[0]) <= DateTime.UtcNow.Year
         && int.Parse(layout.Seasons.Split("-")[1]) >= DateTime.UtcNow.Year);
     var nextCircuitLayoutSvgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{nextCircuitLayout.LayoutId}.svg";
+    var nextCircuitLayoutPngUrl = $"{app.Configuration["BASE_URL"]}/next/img/{nextCircuitLayout.LayoutId}.png";
 
     return TypedResults.Ok(
         new NextRaceResponse
@@ -39,9 +42,26 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
             Circuit = new()
             {
                 LayoutSvgUrl = nextCircuitLayoutSvgUrl,
+                LayoutPngUrl = nextCircuitLayoutPngUrl,
             },
         }
     );
+});
+
+app.MapGet("/next/img/{layoutId}.png", async (string layoutId) =>
+{
+    var svgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{layoutId}.svg";
+
+    var client = new HttpClient();
+    using var svgStream = await client.GetStreamAsync(svgUrl);
+
+    var svgDocument = SvgDocument.Open<SvgDocument>(svgStream);
+    var bitmap = svgDocument.Draw();
+
+    using var outputStream = new MemoryStream();
+    bitmap.Save(outputStream, ImageFormat.Png);
+
+    return Results.File(outputStream.ToArray(), "image/png");
 });
 
 app.Run();

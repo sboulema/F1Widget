@@ -7,7 +7,9 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5176",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TZ": "Europe/Amsterdam",
+        "BASE_URL": "http://localhost:5176"
       }
     },
     "https": {
@@ -17,7 +19,8 @@
       "applicationUrl": "https://localhost:7283;http://localhost:5176",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "TZ": "Europe/Amsterdam"
+        "TZ": "Europe/Amsterdam",
+        "BASE_URL": "https://localhost:7283"
       }
     }
   }

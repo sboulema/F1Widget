@@ -13,6 +13,7 @@ The setting can be changed using environment variables.
 | Name | Value |
 | ---- | ----- |
 | TZ   | TZ identifier taken from [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) |
+| BASE_URL | Base Url where the api is hosted |
 
 # 🖼️ Widgets
 
@@ -72,7 +73,8 @@ The widget requires a JSON model likes this:
     "gp": "03 Nov 18:00"
   },
   "circuit": {
-    "layoutSvgUrl": "..."
+    "layoutSvgUrl": "...",
+    "layoutPngUrl": "..."
   }
 }
 ```
