@@ -1,12 +1,12 @@
-# F1 Widget
+# 🏎️ F1 Widget
 Android KWGT widget that displays the next upcoming Formula 1 race.
 
-## API
+# 🌐 API
 The API provides the widget with all the session data and start times needed by the widget.
 
 It acts like a small proxy between the widget and the source F1 Calendar JSON formatting the JSON so that it can easily be consumed by the widget
 
-### Settings
+## ⚙️ Settings
 The API has a single setting controlling which time zone to show the session times in.
 The setting can be changed using environment variables.
 
@@ -14,26 +14,28 @@ The setting can be changed using environment variables.
 | ---- | ----- |
 | TZ   | TZ identifier taken from [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) |
 
-## Widgets
-[![Mclaren 2024 Chrome](art/Widget_Mclaren_2024_Chrome.png)](widgets/F1Widget_Mclaren_2024_Chrome.kwgt) [![Ferrari 2025](art/F1Widget_Ferrari_2025.jpg)](widgets/F1Widget_Ferrari_2025.kwgt)
+# 🖼️ Widgets
+
+## 2025
+<a href="widgets/F1Widget_Mclaren_2024_Chrome.kwgt"><img src="art/Widget_Mclaren_2024_Chrome.png" width="216" /></a> <a href="widgets/F1Widget_Ferrari_2025.kwgt"><img src="art/F1Widget_Ferrari_2025.jpg" width="216" /></a>
 
 Click pictures to download the widget
 
-### Usage
+## Usage
 TODO
 - Import in KWGT
 - Add new widget size 2x1
 
-## Documentation
+# 📄 Documentation
 
-### Transformation steps
+## Transformation steps
 - Based on the current year we get the correct JSON from the F1 Calendar GitHub
 - Order the races based on the FP1 start times
 - Find the first race that has a session in the future
 - Convert session times to configured time zone
 - Format session times to fit on the widget
 
-### Model
+## Model
 The widget requires a JSON model likes this:
 
 ```
@@ -50,9 +52,10 @@ The widget requires a JSON model likes this:
 }
 ```
 
-## Links
+# 🔗 Links
 - [F1 Calendar](https://f1calendar.com/)
 - [F1 Calendar GitHub](https://github.com/sportstimes/f1)
 - [Kustom HQ](https://docs.kustom.rocks/)
 - [KWGT](https://play.google.com/store/apps/details?id=org.kustom.widget&hl=nl)
 - [Time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+- [Geolocation](https://github.com/scottschluer/geolocation)

@@ -1,7 +1,6 @@
 using F1Widget.Models;
+using Geolocation;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http.Json;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,25 +10,18 @@ var destinationTimeZone = TimeZoneInfo.FindSystemTimeZoneById(app.Configuration[
 
 app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
 {
-    var calendarURL = $"https://raw.githubusercontent.com/sportstimes/f1/refs/heads/main/_db/f1/{DateTime.UtcNow.Year}.json";
-
-    var client = new HttpClient();
-    var calendar = await client.GetFromJsonAsync<Calendar>(calendarURL);
-
-    if (calendar == null)
-    {
-        return TypedResults.NotFound();
-    }
-
-    var nextRace = calendar
-        .Races
-        .OrderBy(race => race.Sessions["fp1"])
-        .FirstOrDefault(race => race.Sessions.Any(session => session.Value >= DateTime.UtcNow));
+    var nextRace = await GetNextRace();
 
     if (nextRace == null)
     {
         return TypedResults.NotFound();
     }
+
+    var nextCircuit = await GetNextCircuit(nextRace);
+    var nextCircuitLayout = nextCircuit?.Layouts.FirstOrDefault(layout
+        => int.Parse(layout.Seasons.Split("-")[0]) <= DateTime.UtcNow.Year
+        && int.Parse(layout.Seasons.Split("-")[1]) >= DateTime.UtcNow.Year);
+    var nextCircuitLayoutSvgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{nextCircuitLayout.LayoutId}.svg";
 
     return TypedResults.Ok(
         new NextRaceResponse
@@ -43,12 +35,55 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
                 Qualifying = GetSessionDateTime(nextRace, "qualifying"),
                 Sprint = GetSessionDateTime(nextRace, "sprint"),
                 GP = GetSessionDateTime(nextRace, "gp"),
-            }
+            },
+            Circuit = new()
+            {
+                LayoutSvgUrl = nextCircuitLayoutSvgUrl,
+            },
         }
     );
 });
 
 app.Run();
+
+async Task<Race?> GetNextRace()
+{
+    var client = new HttpClient();
+
+    var calendarURL = $"https://raw.githubusercontent.com/sportstimes/f1/refs/heads/main/_db/f1/{DateTime.UtcNow.Year}.json";
+    var calendar = await client.GetFromJsonAsync<Calendar>(calendarURL);
+
+    if (calendar == null)
+    {
+        return null;
+    }
+
+    var nextRace = calendar
+        .Races
+        .OrderBy(race => race.Sessions["fp1"])
+        .FirstOrDefault(race => race.Sessions.Any(session => session.Value >= DateTime.UtcNow));
+
+    return nextRace;
+}
+
+async Task<Circuit?> GetNextCircuit(Race nextRace)
+{
+    var client = new HttpClient();
+
+    var circuitsURL = "https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits.json";
+    var circuits = await client.GetFromJsonAsync<IEnumerable<Circuit>>(circuitsURL);
+
+    if (circuits == null)
+    {
+        return null;
+    }
+
+    var nextCircuit = circuits.MinBy(circuit => GeoCalculator.GetDistance(
+        nextRace.Latitude, nextRace.Longitude,
+        circuit.Latitude, circuit.Longitude));
+
+    return nextCircuit;
+}
 
 DateTime? GetSessionDateTime(Race race, string sessionName)
 {
