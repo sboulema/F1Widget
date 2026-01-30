@@ -28,8 +28,8 @@ Click pictures to download the widget
 <a href="widgets/F1NextRace2026_Mercedes.kwgt">Mercedes</a>
 
 ### 2x1
-<a href="widgets/F1NextRace2026_Alpine2_21.kwgt">Alpine</a>,
-<a href="widgets/F1NextRace2026_McLaren_21.kwgt">McLaren</a>
+<a href="widgets/F1NextRace2026_Alpine2_21.kwgt"><img src="art/F1NextRace2026_Alpine2_21.jpg" width="216" /></a>,
+<a href="widgets/F1NextRace2026_McLaren_21.kwgt"><img src="art/F1NextRace2026_McLaren_21.jpg" width="216" /></a>
 
 ## 2025
 <a href="widgets/F1Widget_Ferrari_2025.kwgt"><img src="art/F1Widget_Ferrari_2025.jpg" width="216" /></a>
