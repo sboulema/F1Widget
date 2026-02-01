@@ -86,3 +86,6 @@ The widget requires a JSON model likes this:
 - [KWGT](https://play.google.com/store/apps/details?id=org.kustom.widget&hl=nl)
 - [Time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 - [Geolocation](https://github.com/scottschluer/geolocation)
+- [SVG-NET](https://github.com/svg-net/SVG)
+- [SVG-NET - Linux](https://svg-net.github.io/SVG/articles/GettingStarted.html#special-instructions-for-mac-and-linux)
+- [Alpine GDI+](https://pkgs.alpinelinux.org/package/edge/community/x86/libgdiplus)
