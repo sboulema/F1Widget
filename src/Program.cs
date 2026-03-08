@@ -20,9 +20,7 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
     }
 
     var nextCircuit = await GetNextCircuit(nextRace);
-    var nextCircuitLayout = nextCircuit?.Layouts.FirstOrDefault(layout
-        => int.Parse(layout.Seasons.Split("-")[0]) <= DateTime.UtcNow.Year
-        && int.Parse(layout.Seasons.Split("-")[1]) >= DateTime.UtcNow.Year);
+    var nextCircuitLayout = nextCircuit?.Layouts.FirstOrDefault(IsCurrentCircuitLayout);
     var nextCircuitLayoutSvgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{nextCircuitLayout.LayoutId}.svg";
     var nextCircuitLayoutPngUrl = $"{app.Configuration["BASE_URL"]}/next/img/{nextCircuitLayout.LayoutId}.png";
 
@@ -103,6 +101,39 @@ async Task<Circuit?> GetNextCircuit(Race nextRace)
         circuit.Latitude, circuit.Longitude));
 
     return nextCircuit;
+}
+
+/// <summary>
+/// Checks if the given circuit layout is used in the current season.
+/// </summary>
+/// <remarks>1995,1957,1959,1961-1962</remarks>
+bool IsCurrentCircuitLayout(Layout layout)
+{
+    var currentYear = DateTime.UtcNow.Year;
+
+    return layout
+        .Seasons
+        .Split(',')
+        .Any(season =>
+        {
+            // Layout is used in a single season, e.g. "2024"
+            var isSuccess = int.TryParse(season, out var layoutYear);
+
+            if (isSuccess)
+            {
+                return layoutYear == currentYear;
+            }
+
+            // layout is used in multiple consecutive seasons, e.g. "2020-2024"
+            if (season.Contains('-'))
+            {
+                var startSeason = int.Parse(season.Split('-')[0]);
+                var endSeason = int.Parse(season.Split('-')[1]);
+                return startSeason <= currentYear && endSeason >= currentYear;
+            }
+
+            return false;
+        });
 }
 
 DateTime? GetSessionDateTime(Race race, string sessionName)
