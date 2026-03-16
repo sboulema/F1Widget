@@ -9,4 +9,6 @@ public class Race
     public double Longitude { get; set; }
 
     public Dictionary<string, DateTime> Sessions { get; set; } = [];
+
+    public bool Canceled { get; set; }
 }

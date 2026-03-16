@@ -21,8 +21,8 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
 
     var nextCircuit = await GetNextCircuit(nextRace);
     var nextCircuitLayout = nextCircuit?.Layouts.FirstOrDefault(IsCurrentCircuitLayout);
-    var nextCircuitLayoutSvgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{nextCircuitLayout.LayoutId}.svg";
-    var nextCircuitLayoutPngUrl = $"{app.Configuration["BASE_URL"]}/next/img/{nextCircuitLayout.LayoutId}.png";
+    var nextCircuitLayoutSvgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{nextCircuitLayout?.LayoutId}.svg";
+    var nextCircuitLayoutPngUrl = $"{app.Configuration["BASE_URL"]}/next/img/{nextCircuitLayout?.LayoutId}.png";
 
     return TypedResults.Ok(
         new NextRaceResponse
@@ -36,6 +36,7 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
                 Qualifying = GetSessionDateTime(nextRace, "qualifying"),
                 Sprint = GetSessionDateTime(nextRace, "sprint"),
                 GP = GetSessionDateTime(nextRace, "gp"),
+                Canceled = nextRace.Canceled,
             },
             Circuit = new()
             {
