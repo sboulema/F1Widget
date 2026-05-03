@@ -49,7 +49,7 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
 
 app.MapGet("/next/img/{layoutId}.png", async (string layoutId) =>
 {
-    var svgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/white/{layoutId}.svg";
+    var svgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/detailed/white/{layoutId}.svg";
 
     var client = new HttpClient();
     using var svgStream = await client.GetStreamAsync(svgUrl);
