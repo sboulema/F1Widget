@@ -27,6 +27,4 @@ public class NextRaceResponseRace
 
     [JsonConverter(typeof(DateTimeJsonConverter))]
     public DateTime? GP { get; set; }
-
-    public bool Canceled { get; set; }
 }
