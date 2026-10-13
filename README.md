@@ -73,8 +73,7 @@ The widget requires a JSON model likes this:
     "gp": "03 Nov 18:00"
   },
   "circuit": {
-    "layoutSvgUrl": "...",
-    "layoutPngUrl": "..."
+    "layoutSvgUrl": "..."
   }
 }
 ```
@@ -82,6 +81,7 @@ The widget requires a JSON model likes this:
 # 🔗 Links
 - [F1 Calendar](https://f1calendar.com/)
 - [F1 Calendar GitHub](https://github.com/sportstimes/f1)
+- [F1 DB](https://github.com/f1db/f1db)
 - [Kustom HQ](https://docs.kustom.rocks/)
 - [KWGT](https://play.google.com/store/apps/details?id=org.kustom.widget&hl=nl)
 - [Time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)

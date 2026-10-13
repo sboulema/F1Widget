@@ -1,14 +1,19 @@
-using System.Drawing.Imaging;
+using F1Widget.Caches;
+using F1Widget.Extensions;
 using F1Widget.Models;
 using Geolocation;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Svg;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
 var destinationTimeZone = TimeZoneInfo.FindSystemTimeZoneById(app.Configuration["TZ"] ?? "Etc/UTC");
+
+using var cache = new GitHubReleaseCache("f1db", "f1db", "f1db-json-splitted.zip");
+using var cts = new CancellationTokenSource();
+
+_ = cache.RunAsync(TimeSpan.FromMinutes(15), cts.Token);
 
 app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
 {
@@ -19,12 +24,7 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
         return TypedResults.NotFound();
     }
 
-    var nextCircuit = await GetNextCircuit(nextRace);
-    var nextCircuitLayout = nextCircuit?.Layouts.FirstOrDefault(IsCurrentCircuitLayout);
-    var nextCircuitLayoutSvgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/detailed/white/{nextCircuitLayout?.LayoutId}.svg";
-    var nextCircuitLayoutPngUrl = $"{app.Configuration["BASE_URL"]}/next/img/{nextCircuitLayout?.LayoutId}.png";
-
-    return TypedResults.Ok(
+    var response =
         new NextRaceResponse
         {
             Race = new()
@@ -38,29 +38,21 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
                 GP = GetSessionDateTime(nextRace, "gp"),
                 Canceled = nextRace.Canceled,
             },
-            Circuit = new()
-            {
-                LayoutSvgUrl = nextCircuitLayoutSvgUrl,
-                LayoutPngUrl = nextCircuitLayoutPngUrl,
-            },
-        }
-    );
-});
+        };
 
-app.MapGet("/next/img/{layoutId}.png", async (string layoutId) =>
-{
-    var svgUrl = $"https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits/detailed/white/{layoutId}.svg";
+    var nextCircuit = GetNextCircuit(nextRace);
 
-    var client = new HttpClient();
-    using var svgStream = await client.GetStreamAsync(svgUrl);
+    if (nextCircuit != null)
+    {
+        var nextCircuitLayout = GetNextCircuitLayout(nextCircuit);
 
-    var svgDocument = SvgDocument.Open<SvgDocument>(svgStream);
-    var bitmap = svgDocument.Draw();
+        response.Circuit = new()
+        {
+            LayoutSvgUrl = $"https://raw.githubusercontent.com/f1db/f1db/refs/heads/main/src/assets/circuits/white/{nextCircuitLayout?.Id}.svg",
+        };
+    }
 
-    using var outputStream = new MemoryStream();
-    bitmap.Save(outputStream, ImageFormat.Png);
-
-    return Results.File(outputStream.ToArray(), "image/png");
+    return TypedResults.Ok(response);
 });
 
 app.Run();
@@ -85,12 +77,9 @@ async Task<Race?> GetNextRace()
     return nextRace;
 }
 
-async Task<Circuit?> GetNextCircuit(Race nextRace)
+Circuit? GetNextCircuit(Race nextRace)
 {
-    var client = new HttpClient();
-
-    var circuitsURL = "https://raw.githubusercontent.com/julesr0y/f1-circuits-svg/refs/heads/main/circuits.json";
-    var circuits = await client.GetFromJsonAsync<IEnumerable<Circuit>>(circuitsURL);
+    var circuits = cache.Current?.GetJson<IEnumerable<Circuit>>("f1db-circuits.json");
 
     if (circuits == null)
     {
@@ -104,37 +93,20 @@ async Task<Circuit?> GetNextCircuit(Race nextRace)
     return nextCircuit;
 }
 
-/// <summary>
-/// Checks if the given circuit layout is used in the current season.
-/// </summary>
-/// <remarks>1995,1957,1959,1961-1962</remarks>
-bool IsCurrentCircuitLayout(Layout layout)
+Layout? GetNextCircuitLayout(Circuit nextCircuit)
 {
-    var currentYear = DateTime.UtcNow.Year;
+    var layouts = cache.Current?.GetJson<IEnumerable<Layout>>("f1db-layouts.json");
 
-    return layout
-        .Seasons
-        .Split(',')
-        .Any(season =>
-        {
-            // Layout is used in a single season, e.g. "2024"
-            var isSuccess = int.TryParse(season, out var layoutYear);
+    if (layouts == null)
+    {
+        return null;
+    }
 
-            if (isSuccess)
-            {
-                return layoutYear == currentYear;
-            }
+    var nextCircuitLayout = layouts
+        .Where(layout => layout.CircuitId == nextCircuit.Id)
+        .FirstOrDefault(layout => layout.Effective);
 
-            // layout is used in multiple consecutive seasons, e.g. "2020-2024"
-            if (season.Contains('-'))
-            {
-                var startSeason = int.Parse(season.Split('-')[0]);
-                var endSeason = int.Parse(season.Split('-')[1]);
-                return startSeason <= currentYear && endSeason >= currentYear;
-            }
-
-            return false;
-        });
+    return nextCircuitLayout;
 }
 
 DateTime? GetSessionDateTime(Race race, string sessionName)

@@ -6,5 +6,5 @@ public class Circuit
 
     public double Longitude { get; set; }
 
-    public IEnumerable<Layout> Layouts { get; set; } = [];
+    public string Id { get; set; } = string.Empty;
 }
