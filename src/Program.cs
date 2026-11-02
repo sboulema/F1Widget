@@ -1,3 +1,4 @@
+using System.Text;
 using F1Widget.Caches;
 using F1Widget.Extensions;
 using F1Widget.Models;
@@ -70,7 +71,22 @@ DateTime? GetSessionDateTime(DateOnly? date, TimeOnly? time)
         : TimeZoneInfo.ConvertTimeFromUtc(date.Value.ToDateTime(time.Value), destinationTimeZone);
 
 string GetSessionName(string officialName)
-    => officialName
-        .Replace("Formula 1", string.Empty)
-        .Replace($"Grand Prix {DateTime.UtcNow.Year}", string.Empty)
-        .Trim();
+{
+    var sb = new StringBuilder(officialName);
+
+    sb.Replace("Formula 1", string.Empty);
+
+    sb
+        .Replace("Grand Prix", string.Empty)
+        .Replace("Gran Premio de", string.Empty)
+        .Replace("Grande Prêmio de", string.Empty);
+
+    sb.Replace(DateTime.UtcNow.Year.ToString(), string.Empty);
+
+    if (sb.Length > 0)
+    {
+        sb[0] = char.ToUpper(sb[0]);
+    }
+
+    return sb.ToString().Trim();
+}
