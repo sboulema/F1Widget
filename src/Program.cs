@@ -1,4 +1,3 @@
-using System.Text;
 using F1Widget.Caches;
 using F1Widget.Extensions;
 using F1Widget.Models;
@@ -30,7 +29,7 @@ app.MapGet("/next", async Task<Results<Ok<NextRaceResponse>, NotFound>>() =>
         {
             Race = new()
             {
-                Location = GetSessionName(nextRace.OfficialName),
+                Location = GetGrandPrixName(nextRace.OfficialName),
                 FP1 = GetSessionDateTime(nextRace.FreePractice1Date, nextRace.FreePractice1Time),
                 FP2 = GetSessionDateTime(nextRace.FreePractice2Date, nextRace.FreePractice2Time),
                 FP3 = GetSessionDateTime(nextRace.FreePractice3Date, nextRace.FreePractice3Time),
@@ -70,23 +69,24 @@ DateTime? GetSessionDateTime(DateOnly? date, TimeOnly? time)
         ? null
         : TimeZoneInfo.ConvertTimeFromUtc(date.Value.ToDateTime(time.Value), destinationTimeZone);
 
-string GetSessionName(string officialName)
+string GetGrandPrixName(string officialName)
 {
-    var sb = new StringBuilder(officialName);
+    string[] RemovedGrandPrixNameTerms =
+    [
+        "Formula 1",
+        "Grand Prix",
+        "Gran Premio de",
+        "Grande Prêmio de",
+        DateTime.UtcNow.Year.ToString()
+    ];
 
-    sb.Replace("Formula 1", string.Empty);
+    var cleaned = RemovedGrandPrixNameTerms
+        .Aggregate(
+            officialName,
+            (name, term) => name.Replace(term, string.Empty, StringComparison.OrdinalIgnoreCase));
 
-    sb
-        .Replace("Grand Prix", string.Empty)
-        .Replace("Gran Premio de", string.Empty)
-        .Replace("Grande Prêmio de", string.Empty);
+    var words = cleaned
+        .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
 
-    sb.Replace(DateTime.UtcNow.Year.ToString(), string.Empty);
-
-    if (sb.Length > 0)
-    {
-        sb[0] = char.ToUpper(sb[0]);
-    }
-
-    return sb.ToString().Trim();
+    return string.Join(' ', words).CapitalizeFirstLetter();
 }
